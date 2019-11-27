@@ -1,11 +1,11 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import ReactLoading from 'react-loading'
-import {withRouter} from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import 'react-toastify/dist/ReactToastify.css'
-import {myFirestore, myStorage} from '../../Config/MyFirebase'
+import { myFirestore, myStorage } from '../../Config/MyFirebase'
 import images from './../Themes/Images'
 import './Profile.css'
-import {AppString} from './../Const'
+import { AppString } from './../Const'
 
 class Profile extends Component {
     constructor(props) {
@@ -32,11 +32,11 @@ class Profile extends Component {
     }
 
     onChangeNickname = event => {
-        this.setState({nickname: event.target.value})
+        this.setState({ nickname: event.target.value })
     }
 
     onChangeAboutMe = event => {
-        this.setState({aboutMe: event.target.value})
+        this.setState({ aboutMe: event.target.value })
     }
 
     onChangeAvatar = event => {
@@ -48,14 +48,14 @@ class Profile extends Component {
                 return
             }
             this.newAvatar = event.target.files[0]
-            this.setState({photoUrl: URL.createObjectURL(event.target.files[0])})
+            this.setState({ photoUrl: URL.createObjectURL(event.target.files[0]) })
         } else {
             this.props.showToast(0, 'Something wrong with input file')
         }
     }
 
     uploadAvatar = () => {
-        this.setState({isLoading: true})
+        this.setState({ isLoading: true })
         if (this.newAvatar) {
             const uploadTask = myStorage
                 .ref()
@@ -102,7 +102,7 @@ class Profile extends Component {
                 if (isUpdatePhotoUrl) {
                     localStorage.setItem(AppString.PHOTO_URL, downloadURL)
                 }
-                this.setState({isLoading: false})
+                this.setState({ isLoading: false })
                 this.props.showToast(1, 'Update info success')
             })
     }
@@ -111,10 +111,10 @@ class Profile extends Component {
         return (
             <div className="root">
                 <div className="header">
-                    <span>PROFILE</span>
+                    <span>PERFIL</span>
                 </div>
 
-                <img className="avatar" alt="Avatar" src={this.state.photoUrl}/>
+                <img className="avatar" alt="Avatar" src={this.state.photoUrl} />
 
                 <div className="viewWrapInputFile">
                     <img
@@ -134,23 +134,15 @@ class Profile extends Component {
                     />
                 </div>
 
-                <span className="textLabel">Nickname:</span>
+                <span className="textLabel">Username:</span>
                 <input
                     className="textInput"
                     value={this.state.nickname ? this.state.nickname : ''}
                     placeholder="Your nickname..."
                     onChange={this.onChangeNickname}
                 />
-                <span className="textLabel">About me:</span>
-                <input
-                    className="textInput"
-                    value={this.state.aboutMe ? this.state.aboutMe : ''}
-                    placeholder="Tell about yourself..."
-                    onChange={this.onChangeAboutMe}
-                />
-
                 <button className="btnUpdate" onClick={this.uploadAvatar}>
-                    UPDATE
+                    ACTUALIZAR
                 </button>
 
                 {this.state.isLoading ? (

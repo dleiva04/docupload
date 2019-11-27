@@ -1,11 +1,11 @@
 import firebase from 'firebase'
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import ReactLoading from 'react-loading'
-import {withRouter} from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import 'react-toastify/dist/ReactToastify.css'
-import {myFirebase, myFirestore} from '../../Config/MyFirebase'
+import { myFirebase, myFirestore } from '../../Config/MyFirebase'
 import './Login.css'
-import {AppString} from './../Const'
+import { AppString } from './../Const'
 
 class Login extends Component {
     constructor(props) {
@@ -22,18 +22,18 @@ class Login extends Component {
 
     checkLogin = () => {
         if (localStorage.getItem(AppString.ID)) {
-            this.setState({isLoading: false}, () => {
-                this.setState({isLoading: false})
-                this.props.showToast(1, 'Login success')
+            this.setState({ isLoading: false }, () => {
+                this.setState({ isLoading: false })
+                this.props.showToast(1, 'Acceso exitoso')
                 this.props.history.push('/main')
             })
         } else {
-            this.setState({isLoading: false})
+            this.setState({ isLoading: false })
         }
     }
 
     onLoginPress = () => {
-        this.setState({isLoading: true})
+        this.setState({ isLoading: true })
         myFirebase
             .auth()
             .signInWithPopup(this.provider)
@@ -61,8 +61,8 @@ class Login extends Component {
                                 localStorage.setItem(AppString.ID, user.uid)
                                 localStorage.setItem(AppString.NICKNAME, user.displayName)
                                 localStorage.setItem(AppString.PHOTO_URL, user.photoURL)
-                                this.setState({isLoading: false}, () => {
-                                    this.props.showToast(1, 'Login success')
+                                this.setState({ isLoading: false }, () => {
+                                    this.props.showToast(1, 'Acceso exitoso')
                                     this.props.history.push('/main')
                                 })
                             })
@@ -81,25 +81,25 @@ class Login extends Component {
                             AppString.ABOUT_ME,
                             result.docs[0].data().aboutMe
                         )
-                        this.setState({isLoading: false}, () => {
-                            this.props.showToast(1, 'Login success')
+                        this.setState({ isLoading: false }, () => {
+                            this.props.showToast(1, 'Acceso exitoso')
                             this.props.history.push('/main')
                         })
                     }
                 } else {
-                    this.props.showToast(0, 'User info not available')
+                    this.props.showToast(0, 'Información No Disponible')
                 }
             })
             .catch(err => {
                 this.props.showToast(0, err.message)
-                this.setState({isLoading: false})
+                this.setState({ isLoading: false })
             })
     }
 
     render() {
         return (
             <div className="viewRoot">
-                <div className="header">CHAT DEMO</div>
+                <div className="header">DocUpload</div>
                 <button className="btnLogin" type="submit" onClick={this.onLoginPress}>
                     SIGN IN WITH GOOGLE
                 </button>

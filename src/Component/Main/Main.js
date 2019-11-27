@@ -1,12 +1,12 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import ReactLoading from 'react-loading'
-import {withRouter} from 'react-router-dom'
-import {myFirebase, myFirestore} from '../../Config/MyFirebase'
+import { withRouter } from 'react-router-dom'
+import { myFirebase, myFirestore } from '../../Config/MyFirebase'
 import images from '../Themes/Images'
 import WelcomeBoard from '../WelcomeBoard/WelcomeBoard'
 import './Main.css'
 import ChatBoard from './../ChatBoard/ChatBoard'
-import {AppString} from './../Const'
+import { AppString } from './../Const'
 
 class Main extends Component {
     constructor(props) {
@@ -28,7 +28,7 @@ class Main extends Component {
 
     checkLogin = () => {
         if (!localStorage.getItem(AppString.ID)) {
-            this.setState({isLoading: false}, () => {
+            this.setState({ isLoading: false }, () => {
                 this.props.history.push('/')
             })
         } else {
@@ -40,7 +40,7 @@ class Main extends Component {
         const result = await myFirestore.collection(AppString.NODE_USERS).get()
         if (result.docs.length > 0) {
             this.listUser = [...result.docs]
-            this.setState({isLoading: false})
+            this.setState({ isLoading: false })
         }
     }
 
@@ -51,19 +51,19 @@ class Main extends Component {
     }
 
     doLogout = () => {
-        this.setState({isLoading: true})
+        this.setState({ isLoading: true })
         myFirebase
             .auth()
             .signOut()
             .then(() => {
-                this.setState({isLoading: false}, () => {
+                this.setState({ isLoading: false }, () => {
                     localStorage.clear()
                     this.props.showToast(1, 'Logout success')
                     this.props.history.push('/')
                 })
             })
             .catch(function (err) {
-                this.setState({isLoading: false})
+                this.setState({ isLoading: false })
                 this.props.showToast(0, err.message)
             })
     }
@@ -88,12 +88,12 @@ class Main extends Component {
                             key={index}
                             className={
                                 this.state.currentPeerUser &&
-                                this.state.currentPeerUser.id === item.data().id
+                                    this.state.currentPeerUser.id === item.data().id
                                     ? 'viewWrapItemFocused'
                                     : 'viewWrapItem'
                             }
                             onClick={() => {
-                                this.setState({currentPeerUser: item.data()})
+                                this.setState({ currentPeerUser: item.data() })
                             }}
                         >
                             <img
@@ -102,11 +102,8 @@ class Main extends Component {
                                 alt="icon avatar"
                             />
                             <div className="viewWrapContentItem">
-                <span className="textItem">{`Nickname: ${
-                    item.data().nickname
-                    }`}</span>
-                                <span className="textItem">{`About me: ${
-                                    item.data().aboutMe ? item.data().aboutMe : 'Not available'
+                                <span className="textItem">{`${
+                                    item.data().nickname
                                     }`}</span>
                             </div>
                         </button>
@@ -124,7 +121,7 @@ class Main extends Component {
             <div className="root">
                 {/* Header */}
                 <div className="header">
-                    <span>MAIN</span>
+                    <span>DocUpload</span>
                     <img
                         className="icProfile"
                         alt="An icon default avatar"
@@ -149,11 +146,11 @@ class Main extends Component {
                                 showToast={this.props.showToast}
                             />
                         ) : (
-                            <WelcomeBoard
-                                currentUserNickname={this.currentUserNickname}
-                                currentUserAvatar={this.currentUserAvatar}
-                            />
-                        )}
+                                <WelcomeBoard
+                                    currentUserNickname={this.currentUserNickname}
+                                    currentUserAvatar={this.currentUserAvatar}
+                                />
+                            )}
                     </div>
                 </div>
 
@@ -183,14 +180,14 @@ class Main extends Component {
         return (
             <div>
                 <div className="viewWrapTextDialogConfirmLogout">
-                    <span className="titleDialogConfirmLogout">Are you sure to logout?</span>
+                    <span className="titleDialogConfirmLogout">Cerrar Sesión</span>
                 </div>
                 <div className="viewWrapButtonDialogConfirmLogout">
                     <button className="btnYes" onClick={this.doLogout}>
-                        YES
+                        Si
                     </button>
                     <button className="btnNo" onClick={this.hideDialogConfirmLogout}>
-                        CANCEL
+                        Cancelar
                     </button>
                 </div>
             </div>
