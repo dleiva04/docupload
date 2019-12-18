@@ -6,6 +6,7 @@ import { myFirestore, myStorage } from '../../Config/MyFirebase'
 import images from '../Themes/Images'
 import './ChatBoard.css'
 import { AppString } from './../Const'
+import { saveAs } from 'file-saver';
 
 export default class ChatBoard extends Component {
     constructor(props) {
@@ -30,7 +31,6 @@ export default class ChatBoard extends Component {
     }
 
     componentDidMount() {
-        // For first render, it's not go through componentWillReceiveProps
         this.getListHistory()
     }
 
@@ -62,7 +62,6 @@ export default class ChatBoard extends Component {
             this.groupChatId = `${this.currentPeerUser.id}-${this.currentUserId}`
         }
 
-        // Get history and listen new data added
         this.removeListener = myFirestore
             .collection(AppString.NODE_MESSAGES)
             .doc(this.groupChatId)
@@ -120,49 +119,49 @@ export default class ChatBoard extends Component {
     onChoosePhoto = event => {
         if (event.target.files && event.target.files[0]) {
             this.setState({ isLoading: true })
-            this.currentPhotoFile = event.target.files[0]
-            // Check this file is an image?
-            const prefixFiletype = event.target.files[0].type.toString()
-            if (prefixFiletype.indexOf(AppString.PREFIX_IMAGE) === 0) {
-                this.uploadPhoto()
-            } else {
-                this.setState({ isLoading: false })
-                this.props.showToast(0, 'This file is not an image')
+            let zip = require('jszip')();
+            for (const img of event.target.files) {
+                zip.file(img.name, img);
+                const prefixFiletype = img.type.toString()
+                if (prefixFiletype.indexOf(AppString.PREFIX_IMAGE) === 0) {
+                } else {
+                    this.setState({ isLoading: false })
+                    this.props.showToast(0, 'No es una imagen')
+                }
             }
+            zip.generateAsync({ type: "blob" })
+                .then(fileBlob => {
+                    this.uploadPhoto(fileBlob);
+                });
         } else {
             this.setState({ isLoading: false })
         }
     }
 
-    uploadPhoto = () => {
-        if (this.currentPhotoFile) {
-            const timestamp = moment()
-                .valueOf()
-                .toString()
+    uploadPhoto = (file) => {
+        const timestamp = moment()
+            .valueOf()
+            .toString();
+        console.log(file);
+        const uploadTask = myStorage
+            .ref()
+            .child(timestamp)
+            .put(file)
 
-            const uploadTask = myStorage
-                .ref()
-                .child(timestamp)
-                .put(this.currentPhotoFile)
-
-            uploadTask.on(
-                AppString.UPLOAD_CHANGED,
-                null,
-                err => {
+        uploadTask.on(
+            AppString.UPLOAD_CHANGED,
+            null,
+            err => {
+                this.setState({ isLoading: false })
+                this.props.showToast(0, err.message)
+            },
+            () => {
+                uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
                     this.setState({ isLoading: false })
-                    this.props.showToast(0, err.message)
-                },
-                () => {
-                    uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-                        this.setState({ isLoading: false })
-                        this.onSendMessage(downloadURL, 1)
-                    })
-                }
-            )
-        } else {
-            this.setState({ isLoading: false })
-            this.props.showToast(0, 'File is null')
-        }
+                    this.onSendMessage(downloadURL, 1)
+                })
+            }
+        )
     }
 
     onKeyboardPress = event => {
@@ -268,26 +267,11 @@ export default class ChatBoard extends Component {
                     } else if (item.type === 1) {
                         viewListMessage.push(
                             <div className="viewItemRight2" key={item.timestamp}>
-                                <img
-                                    className="imgItemRight"
-                                    src={item.content}
-                                    alt="content message"
-                                />
-                            </div>
-                        )
-                    } else {
-                        viewListMessage.push(
-                            <div className="viewItemRight3" key={item.timestamp}>
-                                <img
-                                    className="imgItemRight"
-                                    src={this.getGifImage(item.content)}
-                                    alt="content message"
-                                />
+                                <a href={`${item.content}.zip`}>Zip File</a>
                             </div>
                         )
                     }
                 } else {
-                    // Item left (peer message)
                     if (item.type === 0) {
                         viewListMessage.push(
                             <div className="viewWrapItemLeft" key={item.timestamp}>
@@ -375,7 +359,7 @@ export default class ChatBoard extends Component {
         } else {
             return (
                 <div className="viewWrapSayHi">
-                    <span className="textSayHi">Say hi to new friend</span>
+                    <span className="textSayHi">Empieza a chatear</span>
                     <img
                         className="imgWaveHand"
                         src={images.ic_wave_hand}
@@ -394,31 +378,6 @@ export default class ChatBoard extends Component {
             hash = hash & hash // Convert to 32bit integer
         }
         return hash
-    }
-
-    getGifImage = value => {
-        switch (value) {
-            case 'mimi1':
-                return images.mimi1
-            case 'mimi2':
-                return images.mimi2
-            case 'mimi3':
-                return images.mimi3
-            case 'mimi4':
-                return images.mimi4
-            case 'mimi5':
-                return images.mimi5
-            case 'mimi6':
-                return images.mimi6
-            case 'mimi7':
-                return images.mimi7
-            case 'mimi8':
-                return images.mimi8
-            case 'mimi9':
-                return images.mimi9
-            default:
-                return null
-        }
     }
 
     isLastMessageLeft(index) {
